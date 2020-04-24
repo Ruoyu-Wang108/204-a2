@@ -97,3 +97,26 @@ lmd2
 summary(lmd2)
 ```
 
+summary:MC
+- A: P = 1.663 + 0.513 * Q    0.7725
+- B: P = 8.785 + 0.392 * Q   0.7102
+- C: 0<Q<50, P = 0
+  Q >= 50, P = -54.282 + 1.386 *Q   0.8794
+- D: 0<Q<40, P = 0.830 + 0.108 * Q  0.2804 
+  Q>= 40, P = -36.5 + 0.773 * Q  0.8255
+
+```{r dateframe}
+pred1 <- read_csv("prediction1_rw.csv")
+```
+
+
+```{r mcplot}
+ggplot(data = pred1)+
+  geom_line(aes(x = abatement, y = a),color = "pink")+
+  geom_line(aes(x = abatement, y = b), color = "blue")+
+  geom_line(aes(x = abatement, y = c), color = "green")+
+  geom_line(aes(x = abatement, y = d), color = "purple")+
+  scale_y_continuous(limits = c(0,100))+
+  theme_minimal()
+```
+
