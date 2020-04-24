@@ -1,0 +1,57 @@
+---
+title: "ESM 204 Assignment 2"
+subtitle: "Simulating a Carbon Market"
+author: "Ruoyu Wang, Siya Qiu"
+date: "4/22/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE)
+
+library(tidyverse)
+library(janitor)
+library(patchwork)
+```
+
+```{r data}
+sectors <- read_csv("HW2_Data.csv") %>% 
+  janitor::clean_names()
+```
+
+- Current carbon emissions in the sectors are: (A=170, B=200, C=230, and D=300).
+- Sectors A, B, and C are in country X. Sector D is in a different country, Y.
+- Prices are in $/ton and quantities are in tons.
+
+```{r plot}
+
+pa <- ggplot(data = sectors)+
+  geom_point(aes(x = abatement, y = mc_a), color = "red")+
+  labs(title = "Sector A", x = "Abatement (tons)", y = "Marginal abatement costs ($/ton)")+
+  theme_minimal()
+
+pb <- ggplot(data = sectors)+
+  geom_point(aes(x = abatement, y = mc_b), color = "blue")+
+  labs(title = "Sector B", x = "Abatement (tons)", y = "Marginal abatement costs ($/ton)")+
+  theme_minimal()
+
+pc <- ggplot(data = sectors)+
+  geom_point(aes(x = abatement, y = mc_c), color = "pink")+
+  labs(title = "Sector C", x = "Abatement (tons)", y = "Marginal abatement costs ($/ton)")+
+  theme_minimal()
+
+pd <- ggplot(data = sectors)+
+  geom_point(aes(x = abatement, y = mc_d), color = "orange")+
+  labs(title = "Sector D", x = "Abatement (tons)", y = "Marginal abatement costs ($/ton)")+
+  theme_minimal()
+  
+(pa + pb) / (pc + pd)
+```
+
+model predict:
+a: linear
+b: linear 
+c: linear start from x = 50
+d: two linear 1-
