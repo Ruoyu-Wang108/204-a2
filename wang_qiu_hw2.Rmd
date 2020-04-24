@@ -7,13 +7,14 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE,
+knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE,
                       warning = FALSE)
 
 library(tidyverse)
 library(janitor)
 library(patchwork)
+library(stargazer)
 ```
 
 ```{r data}
@@ -54,4 +55,45 @@ model predict:
 a: linear
 b: linear 
 c: linear start from x = 50
-d: two linear 1-
+d: two linear?
+
+```{r lma}
+lma <- lm(mc_a ~ abatement, data = sectors)
+
+lma
+summary(lma)
+```
+```{r lmb}
+lmb <- lm(mc_b ~ abatement, data = sectors)
+lmb
+summary(lmb)
+```
+
+```{r subC-lmc}
+# make a subset of C
+sec_c <- sectors %>% 
+  select(abatement, mc_c) %>% 
+  filter(mc_c > 0)
+
+lmc <- lm(mc_c ~ abatement, data = sec_c)
+lmc
+summary(lmc)
+```
+
+```{r subD-lmd}
+sec_d1 <- sectors %>% 
+  filter(abatement < 40)
+
+lmd1 <- lm(mc_d ~ abatement, data = sec_d1)
+
+sec_d2 <-  sectors %>% 
+  filter(abatement > 40)
+
+lmd2 <- lm(mc_d ~ abatement, data = sec_d2)
+
+lmd1
+summary(lmd1)
+lmd2
+summary(lmd2)
+```
+
