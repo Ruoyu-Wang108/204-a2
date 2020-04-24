@@ -120,3 +120,15 @@ ggplot(data = pred1)+
   theme_minimal()
 ```
 
+```{r demand}
+pollution <-  read_csv("demand_pred_rw.csv")
+
+ggplot(data = pollution)+
+  geom_line(aes(x = q, y = pa),color = "pink")+
+  geom_line(aes(x = q, y = pb),color = "blue")+
+  geom_line(aes(x = q, y = pc),color = "green")+
+  geom_line(aes(x = q, y = p),color = "black")+
+  scale_y_continuous(limits = c(0,300))+
+  theme_minimal()
+```
+
