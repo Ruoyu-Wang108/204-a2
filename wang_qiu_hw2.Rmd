@@ -30,6 +30,9 @@ sectors <- read_csv("HW2_Data.csv") %>%
 
 pa <- ggplot(data = sectors)+
   geom_point(aes(x = abatement, y = mc_a), color = "red")+
+  geom_point(aes(x = abatement, y = mc_b), color = "blue")+
+  geom_point(aes(x = abatement, y = mc_c), color = "pink")+
+  geom_point(aes(x = abatement, y = mc_d), color = "orange")+
   labs(title = "Sector A", x = "Abatement (tons)", y = "Marginal abatement costs ($/ton)")+
   theme_minimal()
 
@@ -48,7 +51,8 @@ pd <- ggplot(data = sectors)+
   labs(title = "Sector D", x = "Abatement (tons)", y = "Marginal abatement costs ($/ton)")+
   theme_minimal()
   
-(pa + pb) / (pc + pd)
+# (pa + pb) / (pc + pd)
+pa
 ```
 
 model predict:
@@ -58,13 +62,14 @@ c: linear start from x = 50
 d: two linear?
 
 ```{r lma}
-lma <- lm(mc_a ~ abatement, data = sectors)
+# set the y intercept to zero
+lma <- lm(mc_a ~ abatement + 0, data = sectors)
 
 lma
 summary(lma)
 ```
 ```{r lmb}
-lmb <- lm(mc_b ~ abatement, data = sectors)
+lmb <- lm(mc_b ~ abatement + 0, data = sectors)
 lmb
 summary(lmb)
 ```
@@ -73,9 +78,9 @@ summary(lmb)
 # make a subset of C
 sec_c <- sectors %>% 
   select(abatement, mc_c) %>% 
-  filter(mc_c > 0)
+  filter(abatement > 30)
 
-lmc <- lm(mc_c ~ abatement, data = sec_c)
+lmc <- lm(mc_c ~ abatement+0, data = sec_c)
 lmc
 summary(lmc)
 ```
@@ -84,7 +89,7 @@ summary(lmc)
 sec_d1 <- sectors %>% 
   filter(abatement < 40)
 
-lmd1 <- lm(mc_d ~ abatement, data = sec_d1)
+lmd1 <- lm(mc_d ~ abatement+0, data = sec_d1)
 
 sec_d2 <-  sectors %>% 
   filter(abatement > 40)
@@ -104,11 +109,26 @@ summary:MC
   Q >= 50, P = -54.282 + 1.386 *Q   0.8794
 - D: 0<Q<40, P = 0.830 + 0.108 * Q  0.2804 
   Q>= 40, P = -36.5 + 0.773 * Q  0.8255
+  
+y-intercept = 0 
+- A p = 0.5291 * Q  0.9304
+- B: P = 0.4768 * Q   0.9204
+- C: 0<Q<50, P = 0
+  Q >= 50, P =  0.8806 *Q  0.9274
+- D: 0<Q<40, P =  0.1436 * Q  0.7591 
+  Q>= 40, P = -36.5 + 0.773 * Q  0.8255
 
 ```{r dateframe}
 pred1 <- read_csv("prediction1_rw.csv")
 ```
 
+```{r}
+ggplot()+
+  geom_point(aes(x = abatement, y = mc_a), color = "red", data = sectors)+
+  geom_line(aes(x = abatement, y = a),color = "pink", data = pred1)+
+  scale_y_continuous(limits = c(0,100))+
+  theme_minimal()
+```
 
 ```{r mcplot}
 ggplot(data = pred1)+
@@ -124,11 +144,34 @@ ggplot(data = pred1)+
 pollution <-  read_csv("demand_pred_rw.csv")
 
 ggplot(data = pollution)+
-  geom_line(aes(x = q, y = pa),color = "pink")+
-  geom_line(aes(x = q, y = pb),color = "blue")+
-  geom_line(aes(x = q, y = pc),color = "green")+
-  geom_line(aes(x = q, y = p),color = "black")+
-  scale_y_continuous(limits = c(0,300))+
-  theme_minimal()
+  geom_line(aes(x = q, y = pa),color = "orange", size = 1.5)+
+  geom_line(aes(x = q, y = pb),color = "blue", size = 1.5)+
+  geom_line(aes(x = q, y = pc),color = "purple", size = 1.5)+
+  geom_line(aes(x = q, y = p),color = "grey60", size = 1)+
+  scale_y_continuous(breaks =  c(0,37,48,59,90,95,114,203), 
+                     limits = c(0,205), expand = c(0,1))+
+  scale_x_continuous(breaks = c(0,59,77,100,163,200,230,300,600), 
+                     limits = c(0,600), expand = c(0,1))+
+  geom_vline(xintercept = 100, linetype = "dashed")+
+  geom_segment(aes(x = 0, xend = 100, y = 37, yend = 37), linetype = "dashed", size = 0.3)+
+  geom_segment(aes(x = 0, xend = 100, y = 48, yend = 48), linetype = "dashed", size = 0.2)+
+  geom_segment(aes(x = 0, xend = 100, y = 114, yend = 114), linetype = "dashed", size = 0.2)+
+  geom_hline(yintercept = 58.56050437, linetype = "dotted", color = "red", size = 0.8)+
+  geom_segment(aes(x = 300, xend = 300,y = 0, yend = 58.56050437), 
+               linetype = "dotted", color = "red", size = 0.7)+
+  geom_segment(aes(x = 163.4993137, xend = 163.4993137,y = 0, yend = 58.56050437), 
+               linetype = "dotted", color = "purple", size = 0.7)+
+  geom_segment(aes(x = 77.18015024, xend = 77.18015024,y = 0, yend = 58.56050437), 
+               linetype = "dotted", color = "blue", size = 0.7)+
+  geom_segment(aes(x = 59.32053607, xend = 59.32053607,y = 0, yend = 58.56050437), 
+               linetype = "dotted", color = "orange", size = 0.7)+
+  labs(x = "Pollution emission (tons)", y = "Price/benefits ($/ton)")+
+  annotate("text", x =160, y =200, label = "Cap = 100 tons")+
+  annotate("text", x =500, y =43, label = "Aggregate Demand Curve", color = "grey60")+
+  annotate("text", x =20, y = 200, label = "C", color = "purple")+
+  annotate("text", x =20, y = 97, label = "B", color = "blue")+
+  annotate("text", x =20, y = 70, label = "A", color = "orange")+
+  annotate("text", x =425, y = 65, label = "Tax to reduce 50% total emission", color = "red")+
+  theme_classic()
 ```
 
