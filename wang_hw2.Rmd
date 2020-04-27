@@ -1,0 +1,174 @@
+---
+title: "ESM 204 Assignment 2"
+subtitle: "Simulating a Carbon Market"
+author: "Ruoyu Wang"
+date: "4/22/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+
+library(tidyverse)
+library(janitor)
+library(patchwork)
+library(stargazer)
+```
+
+```{r data}
+sectors <- read_csv("HW2_Data.csv") %>% 
+  janitor::clean_names()
+```
+
+- Current carbon emissions in the sectors are: (A=170, B=200, C=230, and D=300).
+- Sectors A, B, and C are in country X. Sector D is in a different country, Y.
+- Prices are in $/ton and quantities are in tons.
+
+model predict:
+a: linear
+b: linear 
+c: linear start from x = 50
+d: two linear?
+
+```{r lma}
+# set the y intercept to zero
+lma <- lm(mc_a ~ abatement + 0, data = sectors)
+
+lma
+summary(lma)
+```
+```{r lmb}
+lmb <- lm(mc_b ~ abatement + 0, data = sectors)
+lmb
+summary(lmb)
+```
+
+```{r lmc}
+lmc <- lm(mc_c ~ abatement+0, data = sectors)
+lmc
+summary(lmc)
+```
+
+```{r lmd}
+lmd <- lm(mc_d ~ abatement + 0, data = sectors)
+lmd
+summary(lmd)
+```
+
+
+y-intercept = 0 
+- A p = 0.5291 * Q  0.9304
+- B: P = 0.4768 * Q   0.9204
+- C: P =  0.8707 *Q  0.9178
+- D: P =  0.4353 * Q  0.8888 
+
+
+```{r dateframe}
+pred1 <- read_csv("prediction1_rw.csv")
+```
+
+
+```{r mcplot}
+ggplot(data = pred1)+
+  geom_line(aes(x = abatement, y = a),color = "orange", size = 1.5)+
+  geom_line(aes(x = abatement, y = b), color = "blue", size = 1.5)+
+  geom_line(aes(x = abatement, y = c), color = "purple", size = 1.5)+
+  geom_line(aes(x = abatement, y = d), color = "pink", size = 1.5)+
+  geom_line(aes(x = abatement, y = abcd), color = "grey40", size = 1)+
+  geom_segment(aes(x = 0, xend = 100, y = 52.91, yend = 52.91),color = "orange", linetype = "dashed", size = 0.5)+
+  geom_segment(aes(x = 0, xend = 100, y = 47.68, yend = 47.68),color = "blue", linetype = "dashed", size = 0.5)+
+  geom_segment(aes(x = 0, xend = 100, y = 87.07, yend = 87.07),color = "purple", linetype = "dashed", size = 0.5)+
+  geom_segment(aes(x = 0, xend = 100, y = 43.53, yend = 43.53),color = "pink", linetype = "dashed", size = 0.5)+
+  geom_vline(xintercept = 100, linetype = "dashed")+
+  annotate("text", x =103, y =120, label = "Cap = 100 tons")+
+  annotate("text", x=30,y=123, label = "C P=0.8707*Q R2 = 0.9304", color = "purple")+
+  annotate("text", x=30,y=113, label = "A P=0.5291*Q R2 = 0.9204", color = "orange")+
+  annotate("text", x=30,y=103, label = "B P=0.4768*Q R2 = 0.9178", color = "blue")+
+  annotate("text", x=30,y=93, label = "D P=0.4353*Q R2 = 0.8888", color = "pink")+
+  scale_y_continuous(limits = c(0,130),breaks = c(0,44,48,53,87, 100, 125), expand = c(0,0))+
+  scale_x_continuous(limits = c(0,152),expand = c(0,0))+
+  labs(x = "Abatement (tons)", y = "Price/cost ($/tons)")+
+  theme_classic()
+
+ggsave("abatement.png", height = 4,width = 7)
+```
+
+```{r demand}
+pollution <-  read_csv("demand_pred_rw.csv")
+
+ggplot(data = pollution)+
+  geom_line(aes(x = q, y = pa),color = "orange", size = 1.5)+
+  geom_line(aes(x = q, y = pb),color = "blue", size = 1.5)+
+  geom_line(aes(x = q, y = pc),color = "purple", size = 1.5)+
+  geom_line(aes(x = q, y = p_abc),color = "grey60", size = 1)+
+  scale_y_continuous(breaks =  c(0,58,90,95,200),
+                     limits = c(-0.00001,205), expand = c(0,1))+
+  scale_x_continuous(breaks = c(0,59,77,163,200,230,300,600),
+                     limits = c(0,601), expand = c(0,1))+
+
+  geom_hline(yintercept = 58.41327883, linetype = "dotted", color = "red", size = 0.8)+
+  geom_segment(aes(x = 300, xend = 300,y = 0, yend = 58.41327883),
+               linetype = "dotted", color = "red", size = 0.7)+
+  geom_segment(aes(x = 163, xend = 163,y = 0, yend = 58.41327883),
+               linetype = "dotted", color = "purple", size = 0.7)+
+  geom_segment(aes(x = 77, xend = 77,y = 0, yend = 58.41327883),
+               linetype = "dotted", color = "blue", size = 0.7)+
+  geom_segment(aes(x = 59.5987926036685, xend = 59.5987926036685,y = 0, yend = 58.41327883), linetype = "dotted", color = "orange", size = 0.7)+
+  labs(x = "Pollution emission (tons)", y = "Price/benefits ($/ton)")+
+  
+  annotate("text", x =500, y =44, label = "Aggregate Demand Curve", color = "grey60")+
+  annotate("text", x =20, y = 200, label = "C", color = "purple")+
+  annotate("text", x =20, y = 97, label = "B", color = "blue")+
+  annotate("text", x =20, y = 70, label = "A", color = "orange")+
+  annotate("text", x =424, y = 66, label = "Tax to reduce 50% total emission", color = "red")+
+  theme_classic()
+
+ggsave("pollution_abc.png", width = 7,height = 4)
+```
+
+in country X,
+a. cap on carbon
+(total cost) = (113+200)*100/2=15650
+sector costs 
+A (37+90)*100/2
+B (48+95)*100/2
+C (113+200)*100/2
+tax revenue = 0
+
+b. tax
+tax revenue = 300 *58=17400
+
+```{r fig.width=7}
+ggplot(data = pollution)+
+  geom_line(aes(x = q, y = pa),color = "orange", size = 1.5)+
+  geom_line(aes(x = q, y = pb),color = "blue", size = 1.5)+
+  geom_line(aes(x = q, y = pc),color = "purple", size = 1.5)+
+  geom_line(aes(x = q, y = pd),color = "pink", size = 1)+
+  geom_line(aes(x = q, y = p_abcd),color = "grey60", size = 1)+
+  scale_y_continuous(breaks =  c(0,40,90,95,131,200),
+                     limits = c(-0.00001,205), expand = c(0,1))+
+  scale_x_continuous(breaks = c(0,94,115,184,207,600,900),
+                     limits = c(0,902), expand = c(0,1))+
+  geom_vline(xintercept = 600,linetype = "dashed", size = 0.5)+
+  geom_segment(aes(x = 0, xend = 600,y = 40.36009387, yend = 40.36009387),
+               linetype = "dashed",  size = 0.5)+
+  geom_segment(aes(x = 184, xend = 184,y = 0, yend = 40.36009387),
+               linetype = "dashed",  size = 0.3)+
+  geom_segment(aes(x = 115, xend = 115,y = 0, yend = 40.36009387),
+               linetype = "dashed",  size = 0.3)+
+  geom_segment(aes(x = 93.7193463, xend = 93.7193463,y = 0, yend = 40.36009387), linetype = "dashed", size = 0.3)+
+  geom_segment(aes(x = 207, xend = 207,y = 0, yend = 40.36009387), linetype = "dashed",  size = 0.3)+
+  labs(x = "Pollution emission (tons)", y = "Price/benefits ($/ton)")+
+  annotate("text", x =700, y =180, label = "Cap = 600 tons")+
+  annotate("text", x =360, y =100, label = "Aggregate Demand Curve", color = "grey60")+
+  annotate("text", x =20, y = 200, label = "C", color = "purple")+
+  annotate("text", x =20, y = 97, label = "B", color = "blue")+
+  annotate("text", x =20, y = 70, label = "A", color = "orange")+
+  annotate("text", x =20, y = 135, label = "D", color = "pink")+
+  theme_classic()
+
+ggsave("pollution_abcd.png", height = 4,width = 8)
+```
+
