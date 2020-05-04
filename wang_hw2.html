@@ -434,7 +434,7 @@ lmb</code></pre>
 ## Residual standard error: 12.31 on 15 degrees of freedom
 ## Multiple R-squared:  0.9254, Adjusted R-squared:  0.9204 
 ## F-statistic:   186 on 1 and 15 DF,  p-value: 7.392e-10</code></pre>
-<pre class="r"><code>lmc &lt;- lm(mc_c ~ abatement+0, data = sectors)
+<pre class="r"><code>lmc &lt;- lm(mc_c ~ abatement + 0, data = sectors)
 lmc</code></pre>
 <pre><code>## 
 ## Call:
@@ -489,6 +489,7 @@ lmd</code></pre>
 ## Multiple R-squared:  0.8957, Adjusted R-squared:  0.8888 
 ## F-statistic: 128.9 on 1 and 15 DF,  p-value: 9.191e-09</code></pre>
 <p>y-intercept = 0 - A p = 0.5291 * Q 0.9304 - B: P = 0.4768 * Q 0.9204 - C: P = 0.8707 <em>Q 0.9178 - D: P = 0.4353 </em> Q 0.8888</p>
+<p>if not force the y-intercept to be 0, the R square will be A: 0.7725 B: 0.7102 C: 0.8954 D: 0.8216</p>
 <pre class="r"><code>pred1 &lt;- read_csv(&quot;prediction1_rw.csv&quot;)</code></pre>
 <pre class="r"><code>ggplot(data = pred1)+
   geom_line(aes(x = abatement, y = a),color = &quot;orange&quot;, size = 1.5)+

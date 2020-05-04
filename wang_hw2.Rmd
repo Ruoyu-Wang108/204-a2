@@ -46,7 +46,7 @@ summary(lmb)
 ```
 
 ```{r lmc}
-lmc <- lm(mc_c ~ abatement+0, data = sectors)
+lmc <- lm(mc_c ~ abatement + 0, data = sectors)
 lmc
 summary(lmc)
 ```
@@ -64,6 +64,11 @@ y-intercept = 0
 - C: P =  0.8707 *Q  0.9178
 - D: P =  0.4353 * Q  0.8888 
 
+if not force the y-intercept to be 0, the R square will be 
+A: 0.7725
+B: 0.7102
+C: 0.8954
+D: 0.8216
 
 ```{r dateframe}
 pred1 <- read_csv("prediction1_rw.csv")
